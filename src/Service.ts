@@ -1,42 +1,24 @@
-interface Story {
-    id: number,
-    title: string,
-    url: string,
-    score: number,
-    by: string,
-    time: number
-    type: string
-    descendants: number,
-    kids: Array<number>
-}
-
-interface User {
-    id: string,
-    karma: number,
-    created: number,
-}
+import {User, Item} from "./Interfaces";
 
 export class Service {
 
+    baseUri = `https://hacker-news.firebaseio.com/v0/`;
 
-    async topstories(slice?: [number, number]): Promise<Story[]> {
-        const response = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
-        const topStoriesIds = await response.json();
 
-        if (typeof slice === 'undefined') {
-            slice = [0, 9];
-        }
-
-        return await Promise.all(topStoriesIds.slice(slice[0], slice[1]).map(this.getStory));
+    async fetchTopstories(slice?: [number, number]): Promise<number[]> {
+        return await this.fetch(`${this.baseUri}topstories.json`);
     }
 
-    async getStory(id: number): Promise<Story> {
-        const response = await fetch('https://hacker-news.firebaseio.com/v0/item/' + id + '.json');
-        return await response.json();
+    async fetchItem(id: number): Promise<Item> {
+        return await this.fetch(`${this.baseUri}item/${id}.json`);
     }
 
-    async getUser(id: string): Promise<User> {
-        const response = await fetch('https://hacker-news.firebaseio.com/v0/user/' + id + '.json');
+    async fetchUser(id: string): Promise<User> {
+        return await this.fetch(`${this.baseUri}user/${id}.json`);
+    }
+
+    async fetch(uri: string): Promise<any> {
+        const response = await fetch(uri);
         return await response.json();
     }
 
